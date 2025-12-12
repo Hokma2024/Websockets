@@ -1,0 +1,38 @@
+# Git
+.git
+.gitignore
+
+# Виртуальные окружения
+.venv/
+venv/
+env/
+
+# Python-мусор
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Кэш тестов
+.pytest_cache/
+htmlcov/
+.coverage*
+
+# Логи
+*.log
+
+# IDE / редакторы
+.vscode/
+.idea/
+*.swp
+
+# ОС-мусор
+.DS_Store
+Thumbs.db
+
+# ENV-файлы (если появятся)
+.env
+.env.*
+project1
+project2
+project3
