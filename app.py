@@ -185,6 +185,28 @@ SOCKET_TEST_HTML = dedent("""
     <button id="btnBroadcast">POST /broadcast</button>
   </section>
 
+  <section>
+    <h2>7. Pydantic модели: Product / Transfer / Order</h2>
+
+    <h3>7.1 Product</h3>
+    <label>title: <input id="prodTitle" placeholder="Шоколадка" /></label>
+    <label>price: <input id="prodPrice" placeholder="230.0" /></label>
+    <label>discount: <input id="prodDiscount" placeholder="5.0" /></label>
+    <button id="btnCreateProduct">create_product</button>
+
+    <h3>7.2 Transfer</h3>
+    <label>ac_from: <input id="trFrom" placeholder="4321432143214321" /></label>
+    <label>ac_to: <input id="trTo" placeholder="7890789078907890" /></label>
+    <label>amount: <input id="trAmount" placeholder="330.2" /></label>
+    <button id="btnCreateTransfer">create_transfer</button>
+
+    <h3>7.3 Order</h3>
+    <label>customer_name: <input id="ordName" placeholder="Алиса" /></label>
+    <label>customer_address: <input id="ordAddress" placeholder="Random Street" /></label>
+    <label>total_price: <input id="ordTotalPrice" placeholder="500.3" /></label>
+    <button id="btnCreateOrder">create_order</button>
+  </section>
+
   <pre id="log"></pre>
 
   <script>
@@ -223,6 +245,12 @@ SOCKET_TEST_HTML = dedent("""
         socket.on("score",    (data) => log("score: "    + JSON.stringify(data)));
         socket.on("profile",  (data) => log("profile: "  + JSON.stringify(data)));
 
+        // новые события
+        socket.on("errors",   (data) => log("errors: "   + JSON.stringify(data)));
+        socket.on("product",  (data) => log("product: "  + JSON.stringify(data)));
+        socket.on("transfer", (data) => log("transfer: " + JSON.stringify(data)));
+        socket.on("order",    (data) => log("order: "    + JSON.stringify(data)));
+
         // ===== КНОПКИ / ДЕЙСТВИЯ =====
 
         // 1. Онлайн
@@ -242,7 +270,6 @@ SOCKET_TEST_HTML = dedent("""
         };
 
         document.getElementById("btnProfileOwns").onclick = () => {
-          // profile {} -> ответ profile { owns_rooms: [...] }
           socket.emit("profile");
         };
 
@@ -297,6 +324,52 @@ SOCKET_TEST_HTML = dedent("""
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ message: text })
           }).then(() => log("HTTP POST /broadcast sent"));
+        };
+
+        // 7. Pydantic модели
+
+        // Product
+        document.getElementById("btnCreateProduct").onclick = () => {
+          const title    = document.getElementById("prodTitle").value || "Шоколадка";
+          const priceStr = document.getElementById("prodPrice").value || "230.0";
+          const discStr  = document.getElementById("prodDiscount").value || "5.0";
+
+          const price = parseFloat(priceStr);
+          const discount = parseFloat(discStr);
+
+          socket.emit("create_product", {
+            title,
+            price,
+            discount: isNaN(discount) ? 0 : discount,
+          });
+        };
+
+        // Transfer
+        document.getElementById("btnCreateTransfer").onclick = () => {
+          const acFrom  = document.getElementById("trFrom").value    || "4321432143214321";
+          const acTo    = document.getElementById("trTo").value      || "7890789078907890";
+          const amtStr  = document.getElementById("trAmount").value  || "330.2";
+          const amount  = parseFloat(amtStr);
+
+          socket.emit("create_transfer", {
+            ac_from: acFrom,
+            ac_to: acTo,
+            amount,
+          });
+        };
+
+        // Order
+        document.getElementById("btnCreateOrder").onclick = () => {
+          const name  = document.getElementById("ordName").value        || "Алиса";
+          const addr  = document.getElementById("ordAddress").value     || "Random Street";
+          const total = document.getElementById("ordTotalPrice").value  || "500.3";
+          const totalNum = parseFloat(total);
+
+          socket.emit("create_order", {
+            customer_name: name,
+            customer_address: addr,
+            total_price: totalNum,
+          });
         };
       });
   </script>
