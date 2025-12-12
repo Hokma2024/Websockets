@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+python-socketio[asyncio]
+python-engineio
+loguru
+pydantic
+aiohttp
+jinja2
